@@ -1,0 +1,8 @@
+{
+  "name": "ark-management-suite",
+  "template": "Default",
+  "isConfigured": {
+    "client": false,
+    "server": false
+  }
+}
