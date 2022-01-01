@@ -50,7 +50,6 @@ export default {
   methods: {
     async register() {
       const username = this.username;
-      // const hash = bcrypt.hashSync(this.password, 10);
       await bcrypt.hash(this.password, 10, (err, hash) => {
         if (err) {
           console.log("error:", err);
@@ -67,8 +66,9 @@ export default {
           .then((res) => res.json())
           .then((data) => {
             console.log("data:", data);
-            console.log("Successfully created a new user!");
             this.getAllUsers();
+            this.username = "";
+            this.password = "";
           });
       });
     },
