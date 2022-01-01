@@ -10,8 +10,8 @@
       <label for="password">Password:</label>
       <input type="password" id="password" v-model="password" />
     </div>
-    <button @click="login">Submit</button>
-
+    <button @click.prevent="login">Submit</button>
+    <br /><br />
     <table class="table table-dark">
       <thead>
         <tr>
@@ -30,6 +30,7 @@
 </template>
 
 <script>
+var bcrypt = require("bcryptjs");
 export default {
   data() {
     return {
@@ -40,13 +41,38 @@ export default {
   },
   methods: {
     login() {
-      let allUsers = this.allUsers.filter(user => user.username === this.username);
-      console.log("allUsers:", allUsers)
+      // const hashedPassword = bcrypt.hash(this.password, 10);
+      // console.log("LOg:", hashedPassword);
+
+      const hashedPassword = bcrypt.hash(
+        this.password,
+        10,
+        function (err, hash) {
+          if (err) {
+            console.log(err);
+          }
+          console.log("hash:", hash);
+
+        }
+      );
+
+      const compareResult = bcrypt.compareSync(this.password, hashedPassword);
+      console.log("compareRE:", compareResult);
+
+      if (compareResult) {
+        alert("The two match!");
+      }
+
+      let currentUser = this.allUsers.filter(
+        (user) => user.username === this.username
+      );
+      console.log("allUsers:", currentUser);
 
       fetch("http://localhost:9000/api/")
         .then((res) => res.json())
         .then((data) => {
           this.user = data;
+          this.$router.push({ name: "home" });
         });
     },
 
@@ -60,7 +86,7 @@ export default {
   },
   mounted() {
     this.getAllUsers();
-  }
+  },
 };
 </script>
 

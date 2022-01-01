@@ -36,6 +36,8 @@
 </template>
 
 <script>
+var bcrypt = require("bcryptjs");
+
 export default {
   data() {
     return {
@@ -46,20 +48,29 @@ export default {
     };
   },
   methods: {
-    register() {
-      fetch("http://localhost:9000/api/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: this.username,
-          password: this.password,
-        }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          console.log("data:", data);
-          this.getAllUsers();
-        });
+    async register() {
+      const username = this.username;
+      // const hash = bcrypt.hashSync(this.password, 10);
+      await bcrypt.hash(this.password, 10, (err, hash) => {
+        if (err) {
+          console.log("error:", err);
+        }
+
+        fetch("http://localhost:9000/api/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: username,
+            password: hash,
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            console.log("data:", data);
+            console.log("Successfully created a new user!");
+            this.getAllUsers();
+          });
+      });
     },
 
     getAllUsers() {
