@@ -1,22 +1,87 @@
 'use strict';
 
 const User = require('../models/user_schema');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
-const createData = (req, res) => {
-  User.create(req.body)
-    .then((data) => {
-      console.log('New User Created!', data);
-      res.status(201).json(data);
+const login = (req, res) => {
+
+  const { username, password } = req.body;
+  let result = {};
+
+  //Find the user object that matches the username
+    User.findOne({ username: req.body.username}, (err, user) => {
+      if(err) { console.log("error:", err) }
+  
+      //Compare plaintext password with hashed password in database
+      bcrypt.compare(req.body.password, user.password, (err, match) => {
+        if(err) { console.log("error:", err) }        
+        
+        //If passwords match, create a JWT
+        if(match){
+          console.log("User has successfully logged in!");
+
+          const payload = { user: user.toJSON() };
+          const secret = "temorary secret"; // const secret = process.env.JWT_SECRET;
+          const options = { expiresIn: '2d' };
+          const token = jwt.sign(payload, secret, options);
+
+          result.token = token;
+          result.result = user;
+        } else {
+          result.error = "Error authenticating user";
+          console.log("Either username or password is incorrect");
+        }
+        // res.json(user);
+        res.send(result);
+      });
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        console.error('Error Validating!', err);
-        res.status(422).json(err);
-      } else {
-        console.error(err);
-        res.status(500).json(err);
-      }
-    });
+};
+
+const validateToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  let result;
+
+  if(authHeader) {
+    const token = req.headers.authorization.split(' ')[1]; //This is our Bearer <token>
+    const options = { expiresIn: '2d' };
+
+    try {
+      //Verify token hasn't expired yet
+      result = jwt.verify(token, 'temporary secret', options);
+
+      //Pass decoded token back to the request object
+      req.decoded = result;
+      next();
+    } catch (err) {
+      throw new Error(err);
+    }
+  } else {
+    result = { error: 'Authentication error. Token required!'};
+    res.send(result);
+  }
+}
+
+const logout = (req, res) => {
+  console.log("Logging out user");
+  return;
+}
+
+const registerUser = (req, res) => {
+  User.create(req.body)
+  .then((data) => {
+    console.log('New user created!');
+    res.status(201).json(data);
+  })
+  .catch((err) => {
+    if (err.name === 'ValidationError') {
+      console.error('Error Validating!', err);
+      res.status(422).json(err);
+    } else {
+      console.error(err);
+      res.status(500).json(err);
+    }
+  });
 };
 
 const readData = (req, res) => {
@@ -69,7 +134,10 @@ const deleteData = (req, res) => {
 };
 
 module.exports = {
-  createData,
+  login,
+  logout,
+  validateToken,
+  registerUser,
   readData,
   updateData,
   deleteData,

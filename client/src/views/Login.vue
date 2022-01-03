@@ -40,7 +40,6 @@
 </template>
 
 <script>
-var bcrypt = require("bcryptjs");
 export default {
   data() {
     return {
@@ -48,42 +47,31 @@ export default {
       plaintextPassword: null,
       allUsers: null,
       errors: [],
+      token: null
     };
   },
   methods: {
     async login() {
       this.errors = [];
-      //Get user object
-      let currentUser = this.allUsers.find(
-        (user) => user.username === this.username
-      );
-      console.log("MyCurrentUser:", currentUser);
 
-      if (currentUser) {
-        await bcrypt.compare(
-          this.plaintextPassword,
-          currentUser.password,
-          (err, res) => {
-            if (err) {
-              console.log(err);
-            }
-            console.log("result is: ", res);
-            if (res) {
-              this.$router.push({ name: "home" });
-            } else {
-              this.errors.push("Invalid username or password");
-            }
-          }
-        );
-      } else {
-        this.errors.push("No user found with that username!");
+      if (!this.username) {
+        this.errors.push("Username cannot be left blank");
+      }
+      if (!this.plaintextPassword) {
+        this.errors.push("Password field cannot be left blank");
       }
 
-      fetch("http://localhost:9000/api/")
+      await fetch("http://localhost:9000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: this.username,
+          password: this.plaintextPassword,
+        }),
+      })
         .then((res) => res.json())
-        .then((data) => {
-          this.user = data;
-          // this.$router.push({ name: "home" });
+        .then(() => {
+          this.$router.push({ name: "dashboard" });
         });
     },
 
@@ -97,11 +85,11 @@ export default {
 
     onEnter() {
       this.login();
-    }
+    },
   },
   mounted() {
     this.getAllUsers();
-  }
+  },
 };
 </script>
 

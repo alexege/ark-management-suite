@@ -1,7 +1,10 @@
 const express = require('express');
 
 const {
-  createData,
+  login,
+  logout,
+  validateToken,
+  registerUser,
   readData,
   updateData,
   deleteData,
@@ -10,7 +13,10 @@ const {
 const router = express.Router();
 
 router
-  .post('/', createData)
+  .post('/login', login)
+  .get('/logout', logout)
+  .get('/validate', validateToken)
+  .post('/', registerUser)
   .get('/', readData)
   .put('/:id', updateData)
   .delete('/:id', deleteData);

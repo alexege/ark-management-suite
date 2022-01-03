@@ -64,11 +64,11 @@ export default {
           }),
         })
           .then((res) => res.json())
-          .then((data) => {
-            console.log("data:", data);
-            this.getAllUsers();
-            this.username = "";
-            this.password = "";
+          .then(() => {
+            // this.getAllUsers();
+            // this.username = "";
+            // this.password = "";
+            this.$router.push({ name: "dashboard" });
           });
       });
     },
