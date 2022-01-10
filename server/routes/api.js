@@ -5,6 +5,7 @@ const {
   logout,
   validateToken,
   registerUser,
+  getUserInfo,
   readData,
   updateData,
   deleteData,
@@ -17,6 +18,7 @@ router
   .get('/logout', logout)
   .get('/validate', validateToken)
   .post('/', registerUser)
+  .get('/:username', getUserInfo)
   .get('/', readData)
   .put('/:id', updateData)
   .delete('/:id', deleteData);

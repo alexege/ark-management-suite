@@ -20,6 +20,7 @@
           <th>Password</th>
           <th>createdAt</th>
           <th>updatedAt</th>
+          <th>Roles</th>
         </tr>
       </thead>
       <tbody>
@@ -29,6 +30,7 @@
           <td>{{ user.password }}</td>
           <td>{{ user.createdAt | dateConversion }}</td>
           <td>{{ user.updatedAt }}</td>
+          <td>{{ user.roles }}</td>
         </tr>
       </tbody>
     </table>

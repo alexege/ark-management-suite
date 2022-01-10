@@ -95,6 +95,19 @@ const readData = (req, res) => {
     });
 };
 
+const getUserInfo = (req, res) => {
+  User.findOne({
+    username: req.params.username
+  })
+    .then((data) => {
+      res.status(200).json(data);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json(err);
+    });
+};
+
 const updateData = (req, res) => {
   User.findByIdAndUpdate(req.params.id, req.body, {
     useFindAndModify: false,
@@ -138,6 +151,7 @@ module.exports = {
   logout,
   validateToken,
   registerUser,
+  getUserInfo,
   readData,
   updateData,
   deleteData,

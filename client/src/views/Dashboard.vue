@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1>Dashboard Page</h1>
-    <p>Current logged in user is: {{ user.username }}</p>
+    <p v-if="user">Current logged in user is: {{ user.username }}</p>
   </div>
 </template>
 
@@ -9,24 +9,32 @@
 export default {
   data() {
     return {
-      user: {
-        username: "username",
-      },
+      user: null,
     };
   },
   methods: {
-    validateToken() {
-      console.log("Validating!");
-      fetch("http://localhost:9000/validate")
+    getUser(username) {
+      fetch(`http://localhost:9000/api/${username}`)
         .then((res) => res.json())
         .then((data) => {
-          console.log("Data:", data);
+          this.user = data[0];
         });
     },
-    mounted() {
-    console.log("Test me");
-      this.validateToken();
+
+    validateToken() {
+      fetch("http://localhost:9000/api/validate").then((data) => {
+        console.log("Data:", data);
+        if (data.status === 200) {
+          console.log("User is verified");
+        } else {
+          console.log("User is not verified");
+        }
+      });
     },
+  },
+  mounted() {
+    // this.validateToken();
+    // this.getUser();
   },
 };
 </script>
