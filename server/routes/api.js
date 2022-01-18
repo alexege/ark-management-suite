@@ -9,7 +9,7 @@ const {
   readData,
   updateData,
   deleteData,
-} = require('../controllers/user_controller');
+} = require('../controllers/user.controller');
 
 const router = express.Router();
 
